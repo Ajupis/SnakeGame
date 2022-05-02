@@ -76,13 +76,14 @@ def new_position(snake_position):
     return [x, y]
 
 
-def move_snake(snake_positions, eat, edible_item_position):
+def check_edible(snake_positions, eat, edible_item_position):
     start_eat = False
 
     x, y = new_position(snake_positions[0])
     if not eat and len(edible_item_position) > 0:
         edible_x, edible_y = edible_item_position
-        if edible_x <= x <= edible_x + snake_size - 1 and edible_y <= y <= edible_y + snake_size - 1:
+        if edible_x - snake_size + 1 <= x <= edible_x + snake_size - 1 and \
+                edible_y - snake_size + 1 <= y <= edible_y + snake_size - 1:
             start_eat = True
 
     if start_eat:
@@ -99,11 +100,16 @@ def move_snake(snake_positions, eat, edible_item_position):
         if x == edible_item_position[0] and y == edible_item_position[1]:
             eat = False
             edible_item_position = []
-    else:
+
+    return [snake_positions, eat, edible_item_position]
+
+
+def move_snake(snake_positions, eat):
+    if not eat:
         for snake_position in snake_positions:
             snake_position[0], snake_position[1] = new_position(snake_position)
 
-    return [snake_positions, eat, edible_item_position]
+    return snake_positions
 
 
 def check_change_direction(snake_positions, change_direction):
@@ -182,8 +188,10 @@ while True:
     # Check whether user changed Snake direction
     change_direction = get_change_direction(keys, snake_direction)
 
+    snake_positions, eat, edible_item_position = check_edible(snake_positions, eat, edible_item_position)
+
     # Change direction for all snake items
     snake_direction = check_change_direction(snake_positions, change_direction)
 
     # Move snake items
-    snake_positions, eat, edible_item_position = move_snake(snake_positions, eat, edible_item_position)
+    snake_positions = move_snake(snake_positions, eat)
