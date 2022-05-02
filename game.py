@@ -139,15 +139,7 @@ def get_change_direction(keys, snake_direction):
     return change_direction
 
 
-while True:
-    # Clear the screen before drawing it again
-    screen.fill(0)
-    # Draw the screen elements
-    draw_snake(screen, snake_positions)
-    draw_edible_items(screen, edible_item_position)
-    # Update the screen
-    pygame.display.flip()
-    # Loop through the events
+def process_events(keys):
     for event in pygame.event.get():
         # Check if the event is the X button
         if event.type == pygame.QUIT:
@@ -172,6 +164,20 @@ while True:
                 keys[2] = False
             elif event.key == pygame.K_RIGHT:
                 keys[3] = False
+    return keys
+
+
+while True:
+    # Clear the screen before drawing it again
+    screen.fill(0)
+    # Draw the screen elements
+    draw_snake(screen, snake_positions)
+    draw_edible_items(screen, edible_item_position)
+    # Update the screen
+    pygame.display.flip()
+
+    # Loop through the events
+    keys = process_events(keys)
 
     # Check whether user changed Snake direction
     change_direction = get_change_direction(keys, snake_direction)
