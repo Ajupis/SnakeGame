@@ -65,6 +65,7 @@ def new_position(snake_position):
     x = snake_position[0]
     y = snake_position[1]
     direction = snake_position[2]
+    # EDIT: Here need to change if would like to achieve that snake appears on the opposite side of the game field
     if direction == 0:
         y -= speed
     elif direction == 1:
