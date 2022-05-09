@@ -99,6 +99,7 @@ def check_edible(snake_positions, eat, edible_item_position):
         position[1] = y
         if x == edible_item_position[0] and y == edible_item_position[1]:
             eat = False
+            # EDIT: Here we can add a new edible item instead of clearing it
             edible_item_position = []
 
     return [snake_positions, eat, edible_item_position]
@@ -195,3 +196,5 @@ while True:
 
     # Move snake items
     snake_positions = move_snake(snake_positions, eat)
+
+    # EDIT: Here we can check whether first snake item isn't out of bounds or crashed into the snake itself
