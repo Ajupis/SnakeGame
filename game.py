@@ -1,14 +1,16 @@
 import random
 import pygame
+import time
 
 random.seed()
 
 pygame.init()
 width, height = 640, 480
 screen = pygame.display.set_mode((width, height))
+score = 0
 
 # Snake piece image
-snake = pygame.image.load("resources/images/snake.png")
+snake = pygame.image.load("resources/images/snake.jpg")
 
 # Snake image size
 snake_size = 20
@@ -37,7 +39,7 @@ for i in range(snake_length - 1):
     snake_positions.append(position)
 
 eat = False
-edible = pygame.image.load("resources/images/edible.png")
+edible = pygame.image.load("resources/images/edible.jpg")
 collision = True
 while collision:
     edible_x = random.randint(0, int(width / snake_size) - 1) * 20
@@ -77,7 +79,7 @@ def new_position(snake_position):
     return [x, y]
 
 
-def check_edible(snake_positions, eat, edible_item_position):
+def check_edible(snake_positions, eat, edible_item_position, score):
     start_eat = False
 
     x, y = new_position(snake_positions[0])
@@ -100,10 +102,21 @@ def check_edible(snake_positions, eat, edible_item_position):
         position[1] = y
         if x == edible_item_position[0] and y == edible_item_position[1]:
             eat = False
+            score += 1
+            print("Jānis ir izdzēris " + str(score) + " CIDO suliņas!")
             # EDIT: Here we can add a new edible item instead of clearing it
-            edible_item_position = []
+            collision = True
+            while collision:
+                edible_x = random.randint(0, int(width / snake_size) - 1) * 20
+                edible_y = random.randint(0, int(height / snake_size) - 1) * 20
+                collision = False
+                for snake_position in snake_positions:
+                    if snake_position[0] == edible_x and snake_position[1] == edible_y:
+                        collision = True
 
-    return [snake_positions, eat, edible_item_position]
+            edible_item_position = [edible_x, edible_y]
+
+    return [snake_positions, eat, edible_item_position, score]
 
 
 def move_snake(snake_positions, eat):
@@ -174,6 +187,26 @@ def process_events(keys):
                 keys[3] = False
     return keys
 
+def deathwall(snake_positions):
+    x = snake_positions[0][0]
+    y = snake_positions[0][1]
+    if x < 0 or x > 640 or y < 0 or y > 480:
+        return True
+    return False
+
+def deathsnake(snake_positions):
+    x = snake_positions[0][0]
+    y = snake_positions[0][1]
+    for position in snake_positions[3:]:
+
+        positionx = position[0]
+        positiony = position[1]
+        if positionx - snake_size + 1 <= x <= positionx + snake_size - 1 and \
+                positiony - snake_size + 1 <= y <= positiony + snake_size - 1:
+            return True
+    return False
+
+
 
 while True:
     # Clear the screen before drawing it again
@@ -190,12 +223,18 @@ while True:
     # Check whether user changed Snake direction
     change_direction = get_change_direction(keys, snake_direction)
 
-    snake_positions, eat, edible_item_position = check_edible(snake_positions, eat, edible_item_position)
+    snake_positions, eat, edible_item_position, score = check_edible(snake_positions, eat, edible_item_position, score)
 
     # Change direction for all snake items
     snake_direction = check_change_direction(snake_positions, change_direction)
 
     # Move snake items
     snake_positions = move_snake(snake_positions, eat)
-
+    time.sleep(0.01)
     # EDIT: Here we can check whether first snake item isn't out of bounds or crashed into the snake itself
+    if deathwall(snake_positions):
+        print("Jānis ieskrēja sienā! :O")
+        break
+    elif deathsnake(snake_positions):
+        print("Jānis sevī ieskrēja! :O")
+        break
